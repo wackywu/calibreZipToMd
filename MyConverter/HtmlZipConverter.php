@@ -28,14 +28,6 @@ class HtmlZipConverter
         }
     }
 
-    private function zipMarkDown($fileDir) {
-
-    }
-
-    private function isCalibreZip() {
-
-    }
-
     private function getCalibreConverter() {
         if (empty($this->calibreConverter)) {
             $this->calibreConverter = new CalibreConverter();
@@ -43,18 +35,15 @@ class HtmlZipConverter
         return $this->calibreConverter;
     }
 
-     /**
-     * Html压缩包格式转换
-     * @param $zipFile
-     */
-    public function convertHtmlZip($zipFile) {
+    public function convert($zipFile) {
         $zipDir = is_string($zipFile) ? $zipFile :
             dirname($zipFile);
         $rootDir = pathinfo($zipDir, PATHINFO_DIRNAME);
-        $this->sourceDir = FileUtils::getExistsDir($rootDir.DIRECTORY_SEPARATOR.date('Ym').uniqid());
-        $this->targetDir = FileUtils::getExistsDir($rootDir.DIRECTORY_SEPARATOR.date('Ym').uniqid());
+        $this->sourceDir = HtmlFileUtils::getExistsDir($rootDir.DIRECTORY_SEPARATOR.date('Ym').uniqid());
+        $this->targetDir = HtmlFileUtils::getExistsDir($rootDir.DIRECTORY_SEPARATOR.date('Ym').uniqid());
         //解压Html压缩文件
         $this->unZipHtml($zipDir);
         $this->getCalibreConverter()->convertCalibre($this->sourceDir, $this->targetDir);
+        return $this->targetDir;
     }
 }

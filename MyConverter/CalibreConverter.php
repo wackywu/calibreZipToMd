@@ -32,8 +32,8 @@ class CalibreConverter
         }
         $markdown = $this->converter->convert($content);
         //处理代码块因pre节点导致的错乱
-        $content = preg_replace("/```(\r?\n)*<pre>(\r?\n)*```/", "```\r\n", $content);
-        $content = preg_replace("/(\r?\n)*```(\r?\n)*```/", "\r\n```", $content);
+        $markdown = preg_replace("/```(\r?\n)*<pre>(\r?\n)*```/", "```\r\n", $markdown);
+        $markdown = preg_replace("/(\r?\n)*```(\r?\n)*```/", "\r\n```", $markdown);
 
         //处理代码块显示错乱问题
         $markdown = preg_replace("/```(\r?\n)*/", "```\r\n", $markdown);
@@ -46,7 +46,7 @@ class CalibreConverter
         if (empty($this->htmlPages[$url])) {
             $content = file_get_contents($url);
             //删除“pre”节点的属性
-            $content = CalibreConverter::removeNodeAttribute($content, "pre");
+            $content = HtmlFileUtils::removeNodeAttribute($content, "pre");
             //解析Html各节点的class属性为内嵌style样式
             if ($this->isParseCss) {
                 $content = HtmlCssParser::parseHtmlClasses($content, $this->cssStyles);
@@ -216,8 +216,8 @@ class CalibreConverter
             return $content;
         };
 
-        $fullUrl = FileUtils::getExistsDir($this->sourceDir.DIRECTORY_SEPARATOR. $document["doc_url"]);
-        $nextUrl = FileUtils::getExistsDir($this->sourceDir.DIRECTORY_SEPARATOR. $document["doc_next"]);
+        $fullUrl = HtmlFileUtils::getExistsDir($this->sourceDir.DIRECTORY_SEPARATOR. $document["doc_url"]);
+        $nextUrl = HtmlFileUtils::getExistsDir($this->sourceDir.DIRECTORY_SEPARATOR. $document["doc_next"]);
 
         $root = $this->parseHtmlContent($fullUrl, $nextPage);
         $content = $this->filterHtmlContent($root,
@@ -239,7 +239,7 @@ class CalibreConverter
     }
 
     public function copyImageFiles($imgFiles = null) {
-        $imgPath = FileUtils::getExistsDir($this->imageDir);
+        $imgPath = HtmlFileUtils::getExistsDir($this->imageDir);
         $allowExt = explode('|', 'jpg|jpeg|gif|png');
         $copyFunc = function($filePath) use (&$imgPath, &$imgFiles, &$allowExt, &$copyFunc) {
             $handler = opendir($filePath);
@@ -267,7 +267,7 @@ class CalibreConverter
         $file_path = $this->sourceDir;
         if (!empty($file_path)) {
             @mkdir($imgPath, 0777, true);
-            $copyFunc(FileUtils::getExistsDir($file_path));
+            $copyFunc(HtmlFileUtils::getExistsDir($file_path));
         }
     }
 
@@ -432,7 +432,7 @@ class CalibreConverter
     public function convertCalibre($sourceDir, $targetDir) {
         $this->sourceDir = $sourceDir;
         $this->targetDir = $targetDir;
-        $this->imageDir =  FileUtils::getExistsDir($targetDir.DIRECTORY_SEPARATOR."images");
+        $this->imageDir =  HtmlFileUtils::getExistsDir($targetDir.DIRECTORY_SEPARATOR."images");
         $this->indexHtml = $this->getIndexHtml();//索引页面路径
 
         $this->documents = array();
@@ -449,24 +449,7 @@ class CalibreConverter
         return empty($index) ? $documents : $documents[$index];
     }
 
-    /**
-     * 删除HTML标签对应节点的所有属性
-     * @param $content
-     * @param $tag
-     * @return mixed
-     */
-    public static function removeNodeAttribute($content, $tag) {
-        $patterNode = "/([^>]*)(<([a-z\/][-a-z0-9_:.]*)[^>\/]*(\/*)>)([^<]*)/";
-        $htmlResult = preg_replace_callback($patterNode, function($matches) use(&$tag) {
-            $tagName = $matches[3];
-            if (!empty($tagName) && (substr($tagName, 0, 1) != "/")
-                && (strtolower($tagName) == $tag)) {
-                return $matches[1]."<".$tag.">".$matches[5];
-            }
-            return $matches[1].$matches[2].$matches[5];
-        }, $content);
-        return $htmlResult;
-    }
+
 
     /**
      * 处理代码块因pre节点导致的错乱
@@ -474,7 +457,7 @@ class CalibreConverter
      * @return mixed
      */
     public static function dealCodePartContent($content) {
-        $content = CalibreConverter::removeNodeAttribute($content, "pre");
+        $content = HtmlFileUtils::removeNodeAttribute($content, "pre");
         $content = preg_replace("/```(\r?\n)*<pre>(\r?\n)*```/", "```\r\n", $content);
         $content = preg_replace("/(\r?\n)*```(\r?\n)*```/", "\r\n```", $content);
 

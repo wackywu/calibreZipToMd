@@ -9,21 +9,41 @@
 
 class Html2Markdown
 {
-    public function text2Markdown($content) {
-        echo "text2Markdown" + $content;
-    }
-
-    public function file2Markdown($fileDir) {
-
-        echo "file2Markdown";
-    }
-
     public function convertHtmlZip($fileDir) {
         $converter = new MyConverter\HtmlZipConverter();
-        $converter->convertHtmlZip($fileDir);
+        return $converter->convert($fileDir);
     }
 
-    public static function test() {
-        echo "asdf";
+    public function convertHtmlFile($fileDir) {
+        $converter = new MyConverter\HtmlFileConverter();
+        return $converter->convert($fileDir);
+    }
+
+    public function convertMetaFile($fileDir) {
+        $converter = new MyConverter\MetaDtConverter();
+        return $converter->convert($fileDir);
+    }
+
+    public function convertCalibre($fileDir) {
+        $ext = strtolower(pathinfo($fileDir, PATHINFO_EXTENSION));
+        if ( in_array($ext, explode('|', 'jpg|jpeg|gif|png'))) {
+            return $fileDir;
+        }
+
+        $targetFile = null;
+        switch ($ext) {
+            case 'zip':
+                $targetFile = $this->convertHtmlZip($fileDir);
+                break;
+            case 'opf':
+                $targetFile = $this->convertMetaFile($fileDir);
+                break;
+            case 'html':
+                $targetFile = $this->convertHtmlFile($fileDir);
+                break;
+            default:
+                break;
+        }
+        return $targetFile;
     }
 }
