@@ -421,7 +421,7 @@ class CalibreConverter
             }
             $content = $content.$document["doc_sort"]."\t".$document["file_name"]."\t".$document["doc_name"];
         }
-        $file_path = $this->targetDir.DIRECTORY_SEPARATOR."indexMenu.txt";
+        $file_path = $this->targetDir.DIRECTORY_SEPARATOR."calibreIndex.txt";
         file_put_contents($file_path, $content);
     }
 

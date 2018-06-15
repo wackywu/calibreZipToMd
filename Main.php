@@ -16,6 +16,8 @@ spl_autoload_register(function ($name) {
 var_dump(count($argv));
 if (count($argv) < 2) {
     echo "缺少文件路径参数！";
+    //$converter = new Html2Markdown();
+    //var_dump ($converter->convertCalibre("C:/Users/Administrator/Desktop/test/ttt.zip"));
     exit;
 }
 $sourceFile = $argv[1];

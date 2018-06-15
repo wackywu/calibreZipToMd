@@ -40,4 +40,19 @@ class HtmlFileUtils
         }, $content);
         return $htmlResult;
     }
+
+    public static function deleteDir($dirPath) {
+        $handler = opendir($dirPath);
+        while (($filename=readdir($handler)) !== false) {
+            if ($filename != "." && $filename != "..") {
+                if (is_dir($dirPath . "/" . $filename)) {
+                    HtmlFileUtils::deleteDir($dirPath . "/" . $filename);
+                } else {
+                    @unlink( $dirPath . "/" . $filename );
+                }
+            }
+        }
+        @closedir($dirPath);
+        @rmdir($dirPath);
+    }
 }
