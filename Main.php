@@ -6,8 +6,9 @@
  * Time: 14:56
  */
 spl_autoload_register(function ($name) {
-    echo "Want to load $name.\n";
     $file = __DIR__ .DIRECTORY_SEPARATOR.$name.".php";
+    $file = str_replace("\\", DIRECTORY_SEPARATOR, $file);
+    echo "Want to load $name->$file.\n";
     if (file_exists($file)) {
         include_once $file;
     }
